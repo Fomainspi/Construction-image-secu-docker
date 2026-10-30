@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+<title id="title">Anatomie d'une image Docker</title><desc id="desc">Schéma des éléments qui composent une image Docker.</desc>
+<rect width="1200" height="680" fill="#101820"/><text x="600" y="62" fill="#f4c76b" font-family="Arial" font-size="34" font-weight="bold" text-anchor="middle">ANATOMIE D'UNE IMAGE DOCKER</text>
+<rect x="230" y="112" width="740" height="470" rx="22" fill="#1d2b36" stroke="#d6a84b" stroke-width="3"/>
+<text x="600" y="154" fill="#ffffff" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">Image foma-api:v1.0</text>
+<g font-family="Arial" text-anchor="middle">
+<rect x="300" y="185" width="600" height="66" rx="10" fill="#36566b"/><text x="600" y="225" fill="white" font-size="23">Code de l'application (app.py)</text>
+<rect x="300" y="267" width="600" height="66" rx="10" fill="#36566b"/><text x="600" y="307" fill="white" font-size="23">Dépendances (Flask, Requests...)</text>
+<rect x="300" y="349" width="600" height="66" rx="10" fill="#36566b"/><text x="600" y="389" fill="white" font-size="23">Runtime et bibliothèques système</text>
+<rect x="300" y="431" width="600" height="66" rx="10" fill="#36566b"/><text x="600" y="471" fill="white" font-size="23">Image de base (python:3.13-slim)</text>
+</g>
+<text x="600" y="544" fill="#f4c76b" font-family="Arial" font-size="19" text-anchor="middle">Le Dockerfile décrit comment assembler ces composants</text>
+<text x="600" y="632" fill="#cbd5df" font-family="Arial" font-size="18" text-anchor="middle">FOMA • DevOps from Zero to Production</text>
+</svg>
