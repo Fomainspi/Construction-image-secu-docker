@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560" role="img" aria-labelledby="title desc">
+<title id="title">Pipeline sécurisé de construction d'image</title><desc id="desc">Flux depuis le code source jusqu'au déploiement Kubernetes avec les contrôles de sécurité.</desc>
+<rect width="1400" height="560" fill="#101820"/><text x="700" y="58" fill="#f4c76b" font-family="Arial" font-size="32" font-weight="bold" text-anchor="middle">DU CODE SOURCE À KUBERNETES : PIPELINE DEVSECOPS</text>
+<g font-family="Arial" text-anchor="middle" font-size="20" font-weight="bold">
+<rect x="35" y="170" width="170" height="110" rx="14" fill="#29485c" stroke="#6da9cf" stroke-width="2"/><text x="120" y="215" fill="white">GitHub</text><text x="120" y="245" fill="#d8e5ee" font-size="16">Code source</text>
+<rect x="245" y="170" width="170" height="110" rx="14" fill="#29485c" stroke="#6da9cf" stroke-width="2"/><text x="330" y="215" fill="white">CI</text><text x="330" y="245" fill="#d8e5ee" font-size="16">GitHub Actions</text>
+<rect x="455" y="170" width="170" height="110" rx="14" fill="#5a4520" stroke="#e7b84f" stroke-width="2"/><text x="540" y="215" fill="white">Build Docker</text><text x="540" y="245" fill="#fff0c7" font-size="16">Image + digest</text>
+<rect x="665" y="170" width="170" height="110" rx="14" fill="#5a4520" stroke="#e7b84f" stroke-width="2"/><text x="750" y="215" fill="white">Trivy</text><text x="750" y="245" fill="#fff0c7" font-size="16">Scan image</text>
+<rect x="875" y="170" width="170" height="110" rx="14" fill="#294d43" stroke="#70c6a3" stroke-width="2"/><text x="960" y="215" fill="white">Artifactory</text><text x="960" y="245" fill="#d9f5e9" font-size="16">Stockage</text>
+<rect x="1085" y="170" width="135" height="110" rx="14" fill="#294d43" stroke="#70c6a3" stroke-width="2"/><text x="1152" y="215" fill="white">Xray</text><text x="1152" y="245" fill="#d9f5e9" font-size="16">Analyse</text>
+<rect x="1250" y="170" width="115" height="110" rx="14" fill="#55384a" stroke="#d98ab0" stroke-width="2"/><text x="1307" y="215" fill="white">Cosign</text><text x="1307" y="245" fill="#f8dce9" font-size="16">Signature</text>
+</g>
+<g stroke="#f4c76b" stroke-width="4" fill="none"><path d="M205 225H240 M415 225H450 M625 225H660 M835 225H870 M1045 225H1080 M1220 225H1245"/><path d="M232 217l10 8-10 8 M442 217l10 8-10 8 M652 217l10 8-10 8 M862 217l10 8-10 8 M1072 217l10 8-10 8 M1237 217l10 8-10 8"/></g>
+<path d="M1307 280V360H700V405" stroke="#f4c76b" stroke-width="4" fill="none"/><path d="M690 395l10 12 10-12" stroke="#f4c76b" stroke-width="4" fill="none"/>
+<rect x="500" y="405" width="400" height="88" rx="14" fill="#29485c" stroke="#6da9cf" stroke-width="2"/><text x="700" y="442" fill="white" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">Kubernetes + Kyverno</text><text x="700" y="470" fill="#d8e5ee" font-family="Arial" font-size="17" text-anchor="middle">Vérification de la politique à l'admission</text>
+<text x="700" y="535" fill="#cbd5df" font-family="Arial" font-size="17" text-anchor="middle">SonarQube intervient tôt sur le code • La signature ne remplace jamais les scans</text>
+</svg>
