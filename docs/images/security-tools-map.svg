@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+<title id="title">Qui fait quoi dans la sécurisation des images</title><desc id="desc">Répartition des responsabilités entre SonarQube, Trivy, Artifactory, Xray, Cosign, Kyverno et Kubernetes.</desc>
+<rect width="1200" height="650" fill="#101820"/><text x="600" y="58" fill="#f4c76b" font-family="Arial" font-size="32" font-weight="bold" text-anchor="middle">QUI FAIT QUOI ?</text>
+<g font-family="Arial" text-anchor="middle">
+<rect x="70" y="115" width="320" height="125" rx="16" fill="#29485c" stroke="#6da9cf" stroke-width="2"/><text x="230" y="160" fill="white" font-size="27" font-weight="bold">SonarQube</text><text x="230" y="198" fill="#d8e5ee" font-size="19">Analyse du code source (SAST)</text>
+<rect x="440" y="115" width="320" height="125" rx="16" fill="#5a4520" stroke="#e7b84f" stroke-width="2"/><text x="600" y="160" fill="white" font-size="27" font-weight="bold">Trivy</text><text x="600" y="198" fill="#fff0c7" font-size="19">Scan dépendances, images, IaC</text>
+<rect x="810" y="115" width="320" height="125" rx="16" fill="#294d43" stroke="#70c6a3" stroke-width="2"/><text x="970" y="160" fill="white" font-size="27" font-weight="bold">Artifactory</text><text x="970" y="198" fill="#d9f5e9" font-size="19">Stockage et gestion des artefacts</text>
+<rect x="70" y="300" width="320" height="125" rx="16" fill="#294d43" stroke="#70c6a3" stroke-width="2"/><text x="230" y="345" fill="white" font-size="27" font-weight="bold">JFrog Xray</text><text x="230" y="383" fill="#d9f5e9" font-size="19">Analyse CVE, licences, politiques</text>
+<rect x="440" y="300" width="320" height="125" rx="16" fill="#55384a" stroke="#d98ab0" stroke-width="2"/><text x="600" y="345" fill="white" font-size="27" font-weight="bold">Cosign</text><text x="600" y="383" fill="#f8dce9" font-size="19">Signature et vérification d'image</text>
+<rect x="810" y="300" width="320" height="125" rx="16" fill="#29485c" stroke="#6da9cf" stroke-width="2"/><text x="970" y="345" fill="white" font-size="27" font-weight="bold">Kyverno</text><text x="970" y="383" fill="#d8e5ee" font-size="19">Politiques d'admission Kubernetes</text>
+</g>
+<path d="M600 445V500" stroke="#f4c76b" stroke-width="4"/><path d="M590 490l10 12 10-12" stroke="#f4c76b" stroke-width="4" fill="none"/>
+<rect x="370" y="510" width="460" height="85" rx="16" fill="#26323d" stroke="#f4c76b" stroke-width="2"/><text x="600" y="545" fill="white" font-family="Arial" font-size="25" font-weight="bold" text-anchor="middle">Kubernetes</text><text x="600" y="575" fill="#d8e5ee" font-family="Arial" font-size="18" text-anchor="middle">Exécute les workloads autorisés</text>
+</svg>
