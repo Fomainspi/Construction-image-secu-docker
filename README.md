@@ -22,6 +22,27 @@
 
 > **Principe fondamental :** une image qui se construit correctement n'est pas nécessairement sûre. Il faut contrôler son contenu, maîtriser sa provenance, appliquer des politiques et vérifier ce qui est autorisé à entrer en production.
 
+
+## Illustrations du cours
+
+### 1. Anatomie d'une image Docker
+
+![Schéma illustrant les composants d'une image Docker](docs/images/docker-image-anatomy.svg)
+
+Une image regroupe le runtime, les bibliothèques système, les dépendances et le code applicatif. Le Dockerfile décrit leur assemblage.
+
+### 2. Chaîne CI/CD DevSecOps
+
+![Schéma du pipeline DevSecOps, du code source au déploiement Kubernetes](docs/images/devsecops-pipeline.svg)
+
+Ce flux est un exemple de référence. L'ordre exact des scans, du push, de la signature et de la promotion dépend de l'architecture et des contrôles configurés.
+
+### 3. Responsabilités des outils
+
+![Schéma des responsabilités de SonarQube, Trivy, Artifactory, Xray, Cosign et Kyverno](docs/images/security-tools-map.svg)
+
+Ces outils sont complémentaires : aucun ne remplace à lui seul l'ensemble des contrôles de sécurité.
+
 ---
 
 # 1. Comprendre les artefacts
@@ -384,9 +405,173 @@ Il n'est pas nécessaire d'arrêter aveuglément toutes les applications de l'en
 11. Quelle différence existe-t-il entre signer une image avec Cosign et vérifier sa signature avec Kyverno ?
 12. Que faire lorsqu'une nouvelle CVE critique est découverte dans une image déjà déployée ?
 
+
+# 13. Préparation aux entretiens techniques : questions et réponses expliquées
+
+Cette partie prépare à un entretien DevOps/DevSecOps. Pour chaque question, la réponse explique le concept, son utilité en production et le raisonnement attendu.
+
+## 1. Qu'est-ce qu'une image Docker et quelle est la différence entre une image et un conteneur ?
+
+**Réponse :** Une image Docker est un artefact immuable qui sert de modèle pour créer des conteneurs. Elle contient le système de fichiers nécessaire à l'application : runtime, bibliothèques, dépendances et fichiers applicatifs. Elle est construite à partir d'un Dockerfile et stockée dans un registre.
+
+Un conteneur est une instance en cours d'exécution de cette image. Il possède des processus, un environnement d'exécution, des paramètres réseau et une couche d'écriture.
+
+**Exemple :** foma-api:v1.0 est l'image. Lorsque je lance cette image avec Docker, je crée un conteneur.
+
+**Ce que l'intervieweur vérifie :** vous comprenez la différence entre le modèle (image) et l'instance exécutée (conteneur).
+
+## 2. Que se passe-t-il lorsque vous exécutez docker build ?
+
+**Réponse :** Docker lit le Dockerfile et utilise le répertoire fourni comme contexte de build. Il récupère l'image de base si nécessaire, exécute les instructions, copie les fichiers, installe les dépendances et assemble les couches de l'image. Le résultat est une image locale, identifiée par un nom et un tag, puis par un digest lorsqu'elle est publiée dans un registre.
+
+Le contexte de build est important : un fichier .dockerignore permet d'exclure les dossiers volumineux, les fichiers inutiles et surtout les secrets. Un bon Dockerfile optimise également le cache pour éviter de réinstaller les dépendances à chaque modification du code.
+
+## 3. Comment choisissez-vous une image de base sécurisée ?
+
+**Réponse :** Je vérifie d'abord la compatibilité avec le runtime et les dépendances de l'application. Je privilégie une image officielle ou issue d'une source approuvée, maintenue et régulièrement mise à jour. J'examine les vulnérabilités connues, la fréquence des correctifs, les composants inutiles, la compatibilité des bibliothèques natives et les exigences de l'entreprise.
+
+Une image plus petite peut réduire la surface d'attaque, mais petite ne signifie pas automatiquement sécurisée. Alpine, par exemple, peut poser des problèmes de compatibilité avec certaines dépendances natives. Le choix doit être validé par des tests et des scans.
+
+En production, je fixe une version explicite et j'utilise de préférence un digest pour les opérations critiques afin de garantir l'identité exacte du contenu.
+
+## 4. Pourquoi copier le fichier requirements.txt avant le reste du code dans un Dockerfile ?
+
+**Réponse :** C'est une optimisation du cache Docker. Si les dépendances n'ont pas changé, Docker peut réutiliser la couche où elles ont été installées, même si le code applicatif change. Cela accélère les builds et évite des téléchargements répétitifs.
+
+Le principe est de copier d'abord le fichier de dépendances, installer les packages, puis copier le code source. Il faut néanmoins verrouiller les versions et maîtriser les sources de téléchargement.
+
+## 5. D'où viennent les dépendances installées pendant le build ?
+
+**Réponse :** Elles sont déclarées dans des fichiers comme requirements.txt, package-lock.json, poetry.lock ou pom.xml. Le gestionnaire de packages les télécharge depuis un dépôt configuré : PyPI pour Python, npm Registry pour Node.js, Maven Central pour Maven, ou un dépôt privé d'entreprise.
+
+Artifactory peut agir comme proxy/cache et point central d'accès aux dépendances. Cela aide à maîtriser les sources, les permissions et la disponibilité. Il faut aussi surveiller les dépendances transitives : une bibliothèque ajoutée indirectement peut elle aussi contenir une vulnérabilité.
+
+## 6. Quelle est la différence entre SAST, SCA et le scan d'image conteneur ?
+
+**Réponse :**
+- **SAST** analyse le code source sans exécuter l'application. Il cherche par exemple des constructions de code dangereuses ou des faiblesses de sécurité.
+- **SCA** analyse les composants open source utilisés par l'application, leurs versions, licences et vulnérabilités connues.
+- **Scan d'image** inspecte l'image construite : packages du système d'exploitation, bibliothèques, dépendances applicatives et parfois secrets ou mauvaises configurations.
+
+Ces contrôles sont complémentaires. Une application peut avoir un code source correct mais embarquer une bibliothèque vulnérable. Une image sans CVE connue peut toujours contenir une faille logique dans le code applicatif.
+
+## 7. Quelle est la différence entre SonarQube, Trivy et JFrog Xray ?
+
+**Réponse :** SonarQube est principalement utilisé pour analyser le code source, la qualité et certaines vulnérabilités de sécurité. Trivy est un scanner polyvalent qui peut analyser les systèmes de fichiers, dépendances, images conteneur, fichiers IaC et secrets détectables. JFrog Xray analyse les composants des artefacts indexés dans l'écosystème JFrog, avec une visibilité sur les vulnérabilités, licences et politiques.
+
+Dans un pipeline, je peux lancer SonarQube tôt sur le code, Trivy sur les dépendances et l'image construite, puis utiliser Xray pour analyser l'artefact publié dans Artifactory et appliquer les règles de gouvernance de l'entreprise.
+
+Je ne dis pas qu'un outil remplace toujours l'autre : le choix dépend de la couverture, des licences, des intégrations et de l'architecture.
+
+## 8. Est-ce que pousser une image dans Artifactory garantit qu'elle est sécurisée ?
+
+**Réponse :** Non. Artifactory est un gestionnaire de dépôts et d'artefacts. Il stocke, organise, distribue et contrôle l'accès aux artefacts. Le stockage ne signifie pas que l'image a passé les contrôles de sécurité.
+
+Il faut configurer l'indexation et les analyses Xray, les politiques de sécurité, les seuils de sévérité et l'intégration avec le pipeline CI/CD. Le pipeline doit ensuite interpréter le résultat et décider si l'image peut être promue. Une image peut donc être présente dans le registre tout en étant non approuvée pour la production.
+
+## 9. Est-ce que Xray bloque automatiquement un Docker push lorsqu'il trouve une CVE ?
+
+**Réponse :** Pas nécessairement. Le comportement dépend de la configuration JFrog, des politiques, des permissions et de l'intégration CI/CD. Xray peut détecter une violation et produire un résultat, mais il faut configurer le mécanisme qui transforme cette violation en blocage.
+
+Dans une chaîne bien gouvernée, le pipeline attend le résultat de l'analyse et échoue si une règle bloquante est violée. On peut également empêcher la promotion vers un dépôt de release ou vers la production.
+
+La distinction importante en entretien est celle entre **détecter un problème** et **faire appliquer une décision**.
+
+## 10. À quel moment faut-il signer une image avec Cosign ?
+
+**Réponse :** Généralement après le build et les contrôles obligatoires, lorsque l'image a été acceptée par les règles de sécurité et de qualité. L'image est alors signée, de préférence par digest, pour lier la signature à un contenu précis.
+
+Le pipeline utilise une identité ou une clé de signature gérée de façon sécurisée. Une clé privée ne doit jamais être stockée en clair dans Git ou dans le Dockerfile.
+
+La signature permet à un système en aval de vérifier l'intégrité et la provenance de l'image selon la politique de confiance. Elle ne garantit pas que le contenu ne comporte aucune vulnérabilité.
+
+## 11. Quelle est la différence entre Cosign et Kyverno ?
+
+**Réponse :** Cosign est l'outil de signature et de vérification des images et attestations. Kyverno est un moteur de politiques Kubernetes qui peut demander et appliquer la vérification d'une signature lors de l'admission d'une ressource.
+
+Le pipeline signe l'image validée avec Cosign. Lorsqu'un utilisateur soumet un Deployment Kubernetes, Kyverno vérifie que l'image vient d'une source autorisée et que sa signature correspond à une identité approuvée. Si la politique est configurée en mode bloquant et que la vérification échoue, l'admission est refusée.
+
+Cosign fournit la preuve cryptographique ; Kyverno applique la règle au sein du cluster.
+
+## 12. Pourquoi utiliser un digest plutôt qu'un tag Docker ?
+
+**Réponse :** Un tag, comme foma-api:v1.0, est un nom lisible et pratique, mais il peut être déplacé vers une autre image. Le digest SHA-256 identifie le contenu précis de l'image.
+
+Pour garantir que l'image scannée, signée, promue et déployée est bien la même, je conserve et utilise le digest. Cela réduit le risque qu'un tag soit modifié entre la validation et le déploiement. Les tags restent utiles pour les humains et les versions, mais les opérations de sécurité et de traçabilité doivent s'appuyer sur une référence immuable.
+
+## 13. Une CVE critique est découverte dans une image déjà en production. Que faites-vous ?
+
+**Réponse :** Je ne commence pas par arrêter tous les services sans analyse. Je recherche les images et workloads concernés à partir du digest, j'identifie la dépendance affectée et j'évalue la gravité, l'exploitabilité et l'exposition réelle.
+
+Je bloque la promotion et les nouveaux déploiements de l'image concernée. Selon le risque, je peux isoler le service, réduire son exposition, désactiver une fonctionnalité ou déclencher une mesure d'urgence. Ensuite, je mets à jour la dépendance ou l'image de base, reconstruis une nouvelle image, relance les tests et scans, signe le nouveau digest et le déploie selon une stratégie adaptée.
+
+Enfin, je vérifie la santé de l'application, les logs et les métriques, puis je documente l'incident et les mesures préventives. Une CVE critique exploitable à distance sur un service exposé n'a pas le même niveau d'urgence qu'une vulnérabilité non exploitable dans un composant inutilisé.
+
+## 14. Comment empêcher qu'une image non approuvée soit déployée dans Kubernetes ?
+
+**Réponse :** Je combine les contrôles du pipeline et les politiques d'admission. Dans le pipeline, je définis des portes de validation pour les tests, scans, politiques de vulnérabilités et signatures. Je publie les images approuvées dans un registre contrôlé et je déploie par digest.
+
+Dans le cluster, j'applique des politiques avec Kyverno ou OPA Gatekeeper. Elles peuvent limiter les registres autorisés, exiger des signatures valides, interdire le tag latest et imposer d'autres paramètres de sécurité.
+
+Je protège également les permissions RBAC afin que seuls les acteurs autorisés puissent modifier les workloads et les politiques. La sécurité ne dépend donc pas uniquement du scanner : elle dépend aussi de l'application effective des règles.
+
+## 15. Quelles mesures prenez-vous pour durcir une image Docker ?
+
+**Réponse :** Je pars d'une image de base approuvée et maintenue, limite les packages installés et supprime les outils inutiles. J'utilise si possible un build multi-stage pour ne pas embarquer les outils de compilation dans l'image finale.
+
+Je fais tourner le processus avec un utilisateur non-root lorsque c'est possible, je n'intègre aucun secret dans l'image, j'utilise un .dockerignore, je verrouille les dépendances et je scanne l'image. Je privilégie des tags explicites et des digests pour la traçabilité.
+
+Au runtime, je limite les capacités Linux, j'utilise un système de fichiers en lecture seule si l'application le permet, je définis des limites CPU/mémoire et je contrôle les accès réseau et les permissions Kubernetes. Le durcissement concerne donc le Dockerfile, le pipeline, le registre, le cluster et l'exécution.
+
+## 16. Que doit contenir un pipeline CI/CD sécurisé pour les images Docker ?
+
+**Réponse :** Un pipeline robuste comprend généralement :
+1. récupération du code depuis Git ;
+2. vérification des commits et des règles de branche ;
+3. analyse SAST du code ;
+4. analyse des dépendances et des licences ;
+5. tests unitaires et d'intégration ;
+6. build maîtrisé ;
+7. scan de l'image ;
+8. publication dans un registre privé ;
+9. analyse Xray si disponible ;
+10. décision explicite selon les politiques ;
+11. signature et, si nécessaire, attestations ;
+12. promotion du même artefact vers l'environnement cible ;
+13. vérification de signature et politiques à l'admission Kubernetes ;
+14. surveillance de l'application après déploiement.
+
+Le principe essentiel est de construire une seule fois puis de promouvoir le même artefact validé, plutôt que de reconstruire une image différente à chaque environnement.
+
+## 17. Quelle différence faites-vous entre une vulnérabilité détectée et un risque accepté ?
+
+**Réponse :** Une vulnérabilité est une faiblesse connue ou identifiée dans un composant. Le risque dépend aussi de l'exposition, de l'exploitabilité, des privilèges nécessaires, des données concernées et des mesures de protection existantes.
+
+Une entreprise peut accepter temporairement un risque lorsqu'une correction immédiate est impossible, mais cette décision doit être formalisée : justification, propriétaire, date d'expiration, mesures compensatoires et plan de correction.
+
+Un pipeline mature ne traite pas nécessairement toutes les alertes de la même façon. Il applique des règles transparentes, cohérentes et approuvées par les responsables concernés.
+
+## 18. Comment expliqueriez-vous la chaîne de confiance de bout en bout ?
+
+**Réponse :** La chaîne de confiance commence par le code et les personnes ou systèmes autorisés à le modifier. Le pipeline vérifie le code, les dépendances et les résultats des tests. Il construit ensuite une image identifiée par digest, analyse cette image et publie l'artefact dans un registre contrôlé.
+
+Après validation, le pipeline signe l'image et peut produire des attestations décrivant les contrôles effectués. Lors du déploiement, Kubernetes et le moteur de politiques vérifient que l'image provient d'une source autorisée et respecte les règles. Enfin, la surveillance continue permet de détecter les nouvelles vulnérabilités ou les comportements anormaux.
+
+L'objectif est de pouvoir répondre à trois questions : **qui a produit cet artefact ? Quels contrôles a-t-il passés ? Est-ce bien cet artefact précis qui tourne en production ?**
+
+## Conseils pour répondre en entretien
+
+- Commencez par définir le concept en une ou deux phrases.
+- Expliquez le problème opérationnel que l'outil résout.
+- Donnez un exemple concret tiré d'un pipeline.
+- Distinguez toujours la détection, la décision et l'application de la décision.
+- Si une fonctionnalité dépend de la configuration, dites-le clairement au lieu de prétendre qu'elle est automatique.
+- Pour une question de production, décrivez l'identification du périmètre, la réduction du risque, la correction, la validation et le retour à un état sûr.
+
+
 ---
 
-## 13. Les cinq idées à retenir absolument
+## 14. Les cinq idées à retenir absolument
 
 1. **Dockerfile construit, Docker produit l'image.**
 2. **Artifactory stocke et gère les artefacts ; Xray les analyse et les surveille lorsqu'ils sont indexés.**
